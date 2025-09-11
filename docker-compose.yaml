@@ -4,11 +4,12 @@ services:
     container_name: timecard-bridge
     restart: unless-stopped
     environment:
-      SUPABASE_URL: "https://hguvsjpmiyeypfcuvvko.supabase.co"
-      SECRET_KEY: "${SECRET_KEY}"
-      MQTT_HOST: "10.0.0.180"
-      MQTT_USER: "timecard"
-      MQTT_PASS: "letmein"
+      SUPABASE_URL: "${SUPABASE_URL}"
+      SECRET_KEY: "${SECRET_KEY}"       # service role key
+      MQTT_HOST: "${MQTT_HOST}"
+      MQTT_USER: "${MQTT_USER}"
+      MQTT_PASS: "${MQTT_PASS}"
+      TZ: "${TZ}"
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('10.0.0.180',1883)); s.close()"]
       interval: 30s
