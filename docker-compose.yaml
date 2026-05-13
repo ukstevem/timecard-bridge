@@ -10,9 +10,16 @@ services:
       MQTT_USER: "${MQTT_USER}"
       MQTT_PASS: "${MQTT_PASS}"
       TZ: "${TZ}"
+    volumes:
+      - timecard_outbox:/data
     healthcheck:
-      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.connect(('10.0.0.180',1883)); s.close()"]
+      # Health = outbox responsive AND broker reachable.
+      # Outbox check runs first so a SQLite corruption fails fast.
+      test: ["CMD", "python", "-c", "import sqlite3, socket, os; sqlite3.connect(os.environ.get('OUTBOX_PATH','/data/outbox.db')).execute('SELECT 1').fetchone(); s=socket.socket(); s.connect((os.environ.get('MQTT_HOST','10.0.0.180'), 1883)); s.close()"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 20s
+
+volumes:
+  timecard_outbox:
